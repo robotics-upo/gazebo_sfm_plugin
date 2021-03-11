@@ -4,7 +4,7 @@ A plugin for simulation of human pedestrians in ROS Gazebo.
 The persons are affected by the obstacles and other persons using the [Social Force Model](https://github.com/robotics-upo/lightsfm)
 
 
-![](https://github.com/robotics-upo/gazebo_sfm_plugin/media/images/gazebo_sfm.mp4)
+![](https://github.com/robotics-upo/gazebo_sfm_plugin/media/images/capture2.jpg)
 
 
 **[DOCUMENTATION UNDER CONSTRUCTION]**
@@ -56,7 +56,7 @@ An example snippet is shown next:
 </actor>
 ```
 
-# ROS Dependencies
+# Dependencies
 
 * Social Force Model library, lightsfm https://github.com/robotics-upo/lightsfm
 
