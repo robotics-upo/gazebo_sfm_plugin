@@ -9,6 +9,8 @@ The persons are affected by the obstacles and other persons using the [Social Fo
 
 **[DOCUMENTATION UNDER CONSTRUCTION]**
 
+Tested with Gazebo 9
+
 
 # Plugin configuration
 
@@ -57,3 +59,4 @@ An example snippet is shown next:
 # ROS Dependencies
 
 * Social Force Model library, lightsfm https://github.com/robotics-upo/lightsfm
+
