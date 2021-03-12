@@ -1,20 +1,16 @@
 # gazebo_sfm_plugin
-A plugin for simulation of human pedestrians in ROS Gazebo. 
+A plugin for simulation of human pedestrians in ROS Gazebo.
 
 The persons are affected by the obstacles and other persons using the [Social Force Model](https://github.com/robotics-upo/lightsfm)
 
+The plugin has been tested under ROS Melodic and Gazebo 9.x.
 
 ![](https://github.com/robotics-upo/gazebo_sfm_plugin/blob/master/media/images/capture2.jpg)
 
 
-**[DOCUMENTATION UNDER CONSTRUCTION]**
+## Plugin configuration
 
-Tested with Gazebo 9
-
-
-# Plugin configuration
-
-The plugin acts on each actor indicated in the Gazebo world file.
+The plugin can be applied to each Gazebo Actor indicated in the Gazebo world file.
 
 An example snippet is shown next:
 
@@ -55,8 +51,42 @@ An example snippet is shown next:
 	</plugin>
 </actor>
 ```
+The parameters that can be configured for each pedestrian are:
 
-# Dependencies
+### General params
+
+*  ```<velocity>```. Maximum velocity (*m/s*) of the pedestrian.
+*  ```<radius>```. Approximate radius of the pedestrian's body (m).
+*  ```<animation_factor>```. Factor employed to coordinate the animation with the walking velocity.
+* ```<people_distance>```.  Maximum detection distance of the surrounding pedestrians.
+
+### SFM Weights
+
+*  The weight factors that modify the navigation behavior. See the [Social Force Model](https://github.com/robotics-upo/lightsfm) for further information.
+
+### Obstacle params
+
+* ```<ignore_obstacles>```.  All the models that must be ignored as obstacles, must be indicated here. The other actors in the world are included automatically.
+
+### Trajectory params
+
+* ```<trajectory>```. The list of waypoints that the actor must reach must be indicated here. 
+
+	- ```<waypoint>```. Each waypoint must be indicated by its coordinates X, Y, Z in the world frame.
+	- ```<cyclic>```. If true, the actor will start the waypoint sequence when the last waypoint is reached.
+
+## Dependencies
 
 * Social Force Model library, lightsfm https://github.com/robotics-upo/lightsfm
+
+## Compilation
+
+* This is a ROS package so it must be placed inside a ROS workspace and compiled through the regular Catkin tools. 
+
+## Example
+
+An example Gazebo world can be launched through:
+```sh
+roslaunch gazebo\_sfm\_plugin cafe.launch
+```
 

@@ -238,7 +238,7 @@ void PedestrianSFMPlugin::HandleObstacles()
 void PedestrianSFMPlugin::HandlePedestrians()
 {
   this->otherActors.clear();
-  // this->myGroup.clear();
+
   for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
   {
     physics::ModelPtr model = this->world->ModelByIndex(i);  // GetModel(i);

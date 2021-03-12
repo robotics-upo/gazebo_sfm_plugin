@@ -57,53 +57,35 @@ public:
 private:
   void OnUpdate(const common::UpdateInfo &_info);
 
-  /// \brief Helper function to choose a new target location
-  // private: void ChooseNewTarget();
 
   // private: void InitializePedestrians();
 
-  /// \brief Helper function to avoid obstacles. This implements a very
-  /// simple vector-field algorithm.
-  /// \param[in] _pos Direction vector that should be adjusted according
-  /// to nearby obstacles.
+  /// \brief Helper function to detect the closest obstacles.
 private:
   void HandleObstacles();
 
-  // private: void HandleGroup();
-
+  /// \brief Helper function to detect the nearby pedestrians (other actors).
 private:
   void HandlePedestrians();
 
-  // private: ignition::math::Vector3d ComputeForce();
 
+ //-------------------------------------------------
+
+   /// \brief this actor as a SFM agent
 private:
   sfm::Agent sfmActor;
 
+  /// \brief names of the other models in my walking group.
 private:
   std::vector<std::string> groupNames;
 
-private:
-  std::vector<sfm::Agent> myGroup;
-
+  /// \brief vector of pedestrians detected.
 private:
   std::vector<sfm::Agent> otherActors;
 
+  /// \brief Maximum distance to detect nearby pedestrians.
 private:
   double peopleDistance;
-
-  /// \brief ordered list of goal locations
-  // private: std::queue<ignition::math::Vector3d> goals;
-
-  /// \brief Current target location
-  // private: ignition::math::Vector3d currentGoalIndex;
-  // ignition::math::Vector3d currentGoal;
-
-  // private: bool cyclicTrajectory;
-
-
-  //
-
-  //-------------------------------------------------
 
   /// \brief Pointer to the parent actor.
 private:
