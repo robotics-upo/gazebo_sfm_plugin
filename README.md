@@ -87,6 +87,6 @@ The parameters that can be configured for each pedestrian are:
 
 An example Gazebo world can be launched through:
 ```sh
-roslaunch gazebo\_sfm\_plugin cafe.launch
+roslaunch gazebo_sfm_plugin cafe.launch
 ```
 
