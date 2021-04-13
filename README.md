@@ -5,7 +5,7 @@ The persons are affected by the obstacles and other persons using the [Social Fo
 
 The plugin has been tested under ROS Melodic and Gazebo 9.x.
 
-![](https://github.com/robotics-upo/gazebo_sfm_plugin/blob/master/media/images/capture2.jpg)
+![](https://github.com/robotics-upo/gazebo_sfm_plugin/blob/master/media/images/capture3.jpg)
 
 
 ## Plugin configuration
