@@ -1,9 +1,11 @@
 # gazebo_sfm_plugin
 A plugin for simulation of human pedestrians in ROS Gazebo.
 
+**Check the branch galactic for the ROS2 version of this plugin**
+
 The persons are affected by the obstacles and other persons using the [Social Force Model](https://github.com/robotics-upo/lightsfm)
 
-The plugin has been tested under ROS Melodic and Gazebo 9.x.
+The plugin has been tested under ROS Melodic and Noetic and Gazebo 9.x and Gazebo 11.
 
 ![](https://github.com/robotics-upo/gazebo_sfm_plugin/blob/master/media/images/capture3.jpg)
 
