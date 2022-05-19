@@ -2,7 +2,7 @@
 /**                                                                    */
 /** PedestrianSFMPlugin.cpp                                            */
 /**                                                                    */
-/** Copyright (c) 2021, Service Robotics Lab (SRL).                    */
+/** Copyright (c) 2022, Service Robotics Lab (SRL).                    */
 /**                     http://robotics.upo.es                         */
 /**                                                                    */
 /** All rights reserved.                                               */
@@ -41,15 +41,6 @@ void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   this->world = this->actor->GetWorld();
 
   this->sfmActor.id = this->actor->GetId();
-
-  // std::string s = "scott>=tiger";
-  // std::string delimiter = ">=";
-  // std::string token = s.substr(0, s.find(delimiter));
-
-  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      std::bind(&PedestrianSFMPlugin::OnUpdate, this, std::placeholders::_1)));
-
-  this->Reset();
 
   // Initialize sfmActor position
   ignition::math::Vector3d pos = this->actor->WorldPose().Pos();
@@ -98,6 +89,11 @@ void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   else
     this->animationFactor = 4.5;
 
+  if (_sdf->HasElement("animation_name")) {
+    this->animationName = _sdf->Get<std::string>("animation_name");
+  } else
+    this->animationName = WALKING_ANIMATION;
+
   if (_sdf->HasElement("people_distance"))
     this->peopleDistance = _sdf->Get<double>("people_distance");
   else
@@ -135,6 +131,11 @@ void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
       this->ignoreModels.push_back(model->GetName());
     }
   }
+
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+      std::bind(&PedestrianSFMPlugin::OnUpdate, this, std::placeholders::_1)));
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -163,12 +164,12 @@ void PedestrianSFMPlugin::Reset() {
   }
 
   auto skelAnims = this->actor->SkeletonAnimations();
-  if (skelAnims.find(WALKING_ANIMATION) == skelAnims.end()) {
-    gzerr << "Skeleton animation " << WALKING_ANIMATION << " not found.\n";
+  if (skelAnims.find(this->animationName) == skelAnims.end()) {
+    gzerr << "Skeleton animation " << this->animationName << " not found.\n";
   } else {
     // Create custom trajectory
     this->trajectoryInfo.reset(new physics::TrajectoryInfo());
-    this->trajectoryInfo->type = WALKING_ANIMATION;
+    this->trajectoryInfo->type = this->animationName;
     this->trajectoryInfo->duration = 1.0;
 
     this->actor->SetCustomTrajectory(this->trajectoryInfo);
@@ -191,25 +192,26 @@ void PedestrianSFMPlugin::HandleObstacles() {
       std::tuple<bool, double, ignition::math::Vector3d> intersect =
           model->BoundingBox().Intersect(modelPos, actorPos, 0.05, 8.0);
 
-      // ignition::math::Vector3d offset1 = modelPos - actorPos;
-      // double modelDist1 = offset1.Length();
-      // double dist1 = actorPos.Distance(modelPos);
+      if (std::get<0>(intersect) == true) {
 
-      ignition::math::Vector3d offset = std::get<2>(intersect) - actorPos;
-      double modelDist = offset.Length();
-      // double dist2 = actorPos.Distance(std::get<2>(intersect));
+        // ignition::math::Vector3d = model->BoundingBox().Center();
+        // double approximated_radius = std::max(model->BoundingBox().XLength(),
+        //                                      model->BoundingBox().YLength());
 
-      // printf("Actor %s, Model %s - dist: %.2f\n",
-      //        this->actor->GetName().c_str(), model->GetName().c_str(),
-      //        modelDist);
+        // ignition::math::Vector3d offset1 = modelPos - actorPos;
+        // double modelDist1 = offset1.Length();
+        // double dist1 = actorPos.Distance(modelPos);
 
-      //{
-      if (modelDist < minDist) {
-        minDist = modelDist;
-        // closest_obs = offset;
-        closest_obs = std::get<2>(intersect);
+        ignition::math::Vector3d offset = std::get<2>(intersect) - actorPos;
+        double modelDist = offset.Length(); // - approximated_radius;
+        // double dist2 = actorPos.Distance(std::get<2>(intersect));
+
+        if (modelDist < minDist) {
+          minDist = modelDist;
+          // closest_obs = offset;
+          closest_obs = std::get<2>(intersect);
+        }
       }
-      //}
     }
   }
 
@@ -219,8 +221,10 @@ void PedestrianSFMPlugin::HandleObstacles() {
   // printf("Model offset x: %.2f y: %.2f\n", closest_obs.X(), closest_obs.Y());
   // printf("Model intersec x: %.2f y: %.2f\n\n", closest_obs2.X(),
   //        closest_obs2.Y());
-  utils::Vector2d ob(closest_obs.X(), closest_obs.Y());
-  this->sfmActor.obstacles1.push_back(ob);
+  if (minDist <= 10.0) {
+    utils::Vector2d ob(closest_obs.X(), closest_obs.Y());
+    this->sfmActor.obstacles1.push_back(ob);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -233,7 +237,8 @@ void PedestrianSFMPlugin::HandlePedestrians() {
     if (model->GetId() != this->actor->GetId() &&
         ((int)model->GetType() == (int)this->actor->GetType())) {
       // printf("Actor %i has detected actor %i!\n", this->actor->GetId(),
-      // model->GetId());
+      //        model->GetId());
+
       ignition::math::Pose3d modelPose = model->WorldPose();
       ignition::math::Vector3d pos =
           modelPose.Pos() - this->actor->WorldPose().Pos();
@@ -264,8 +269,9 @@ void PedestrianSFMPlugin::HandlePedestrians() {
       }
     }
   }
-  // printf("Actor %i has detected %i actors!\n", this->actor->GetId(),
-  // (int)this->otherActors.size());
+  // printf("Actor %s has detected %i actors!\n",
+  // this->actor->GetName().c_str(),
+  //        (int)this->otherActors.size());
 }
 
 /////////////////////////////////////////////////
@@ -283,6 +289,7 @@ void PedestrianSFMPlugin::OnUpdate(const common::UpdateInfo &_info) {
 
   // Compute Social Forces
   sfm::SFM.computeForces(this->sfmActor, this->otherActors);
+
   // Update model
   sfm::SFM.updatePosition(this->sfmActor, dt);
 

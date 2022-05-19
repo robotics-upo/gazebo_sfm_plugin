@@ -89,6 +89,7 @@
         <velocity>0.9</velocity>
         <radius>0.4</radius>
         <animation_factor>5.1</animation_factor>
+        <animation_name>walking</animation_name>
         <people_distance>6.0</people_distance>
         <!-- weights -->
         <goal_weight>2.0</goal_weight>
@@ -112,11 +113,11 @@
     <actor name="actor2">
       <pose>-1 -8 1.25 0 0 0</pose>
       <skin>
-        <filename>walk-blue.dae</filename> <!--run.dae-->
+        <filename>walk-blue.dae</filename> 
         <scale>1.0</scale>
       </skin>
       <animation name="walking">
-        <filename>walk-blue.dae</filename>
+        <filename>walk-blue.dae</filename> 
         <scale>1.000000</scale>
         <interpolate_x>true</interpolate_x>
       </animation>
@@ -125,10 +126,11 @@
         <velocity>1.2</velocity>
         <radius>0.4</radius>
         <animation_factor>5.1</animation_factor>
+        <animation_name>walking</animation_name>
         <people_distance>6.0</people_distance>
         <goal_weight>2.0</goal_weight>
         <obstacle_weight>80.0</obstacle_weight>
-        <social_weight>15.0</social_weight> <!--2.1-->
+        <social_weight>15.0</social_weight> 
         <group_gaze_weight>3.0</group_gaze_weight>
         <group_coh_weight>2.0</group_coh_weight>
         <group_rep_weight>1.0</group_rep_weight>
@@ -170,7 +172,7 @@
     </actor>
     
     
-    <actor name="actor4">
+    <!--<actor name="actor4">
       <pose>3 0 1.25 0 0 0</pose>
       <skin>
         <filename>walk-green.dae</filename> 
@@ -203,9 +205,65 @@
           <waypoint>-3 0 1.25</waypoint>
         </trajectory>
       </plugin>
-    </actor>
+    </actor>-->
 
-    <!--<actor name="actor4">
+
+    <!-- <actor name="actor4">
+      <pose>1 -8 0.1 0 0 3.1416</pose>
+      <skin>
+        <filename>FrankWhiteBlender2/FrankWhiteBlender2.dae</filename> 
+        <scale>1</scale>
+      </skin>
+      <animation name="walkingboy">
+        <filename>walk.dae</filename>
+        <scale>1</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>8.000000</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walkingboy">
+          <waypoint>
+            <time>0</time>
+            <pose>1 -8 0.1 0 0 3.1416</pose>
+          </waypoint>
+          <waypoint>
+            <time>8</time>
+            <pose>2 1 0.1 0 0 3.1416</pose>
+          </waypoint>
+          <waypoint>
+            <time>16</time>
+            <pose>1 -8 0.1 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script> 
+
+      <plugin name="actor4_plugin" filename="libPedestrianSFMPlugin.so">
+        <velocity>1.0</velocity>
+        <radius>0.4</radius>
+        <animation_factor>5.1</animation_factor>
+        <people_distance>6.0</people_distance>
+        <goal_weight>2.0</goal_weight>
+        <obstacle_weight>80.0</obstacle_weight>
+        <social_weight>15.0</social_weight> 
+        <group_gaze_weight>3.0</group_gaze_weight>
+        <group_coh_weight>2.0</group_coh_weight>
+        <group_rep_weight>1.0</group_rep_weight>
+        <ignore_obstacles>
+          <model>cafe</model>
+          <model>ground_plane</model>
+        </ignore_obstacles>
+        <trajectory>
+          <cyclic>true</cyclic>
+          <waypoint>1 -8 0.1</waypoint>
+          <waypoint>2 1 0.1</waypoint>
+        </trajectory>
+      </plugin>
+    </actor>-->
+
+
+    <actor name="actor4">
       <pose>3 0 1.25 0 0 0</pose>
       <skin>
         <filename>walk.dae</filename> 
@@ -221,6 +279,7 @@
         <velocity>1.0</velocity>
         <radius>0.4</radius>
         <animation_factor>5.1</animation_factor>
+        <animation_name>walking</animation_name>
         <people_distance>6.0</people_distance>
         <goal_weight>2.0</goal_weight>
         <obstacle_weight>80.0</obstacle_weight>
@@ -259,6 +318,7 @@
         <velocity>0.7</velocity>
         <radius>0.4</radius>
         <animation_factor>5.1</animation_factor>
+        <animation_name>walking</animation_name>
         <people_distance>6.0</people_distance>
         <goal_weight>2.0</goal_weight>
         <obstacle_weight>80.0</obstacle_weight>
@@ -279,7 +339,7 @@
           <waypoint>-3 0.8 1.25</waypoint>
         </trajectory>
       </plugin>
-    </actor>-->
+    </actor>
 
   </world>
 </sdf>

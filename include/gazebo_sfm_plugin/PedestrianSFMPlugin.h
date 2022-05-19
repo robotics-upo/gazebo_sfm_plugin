@@ -2,7 +2,7 @@
 /**                                                                    */
 /** PedestrianSFMPlugin.h                                              */
 /**                                                                    */
-/** Copyright (c) 2021, Service Robotics Lab (SRL).                    */
+/** Copyright (c) 2022, Service Robotics Lab (SRL).                    */
 /**                     http://robotics.upo.es                         */
 /**                                                                    */
 /** All rights reserved.                                               */
@@ -22,9 +22,9 @@
 #define GAZEBO_PLUGINS_PEDESTRIANSFMPLUGIN_HH_
 
 // C++
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 // Gazebo
 #include "gazebo/common/Plugin.hh"
@@ -34,10 +34,8 @@
 // Social Force Model
 #include <lightsfm/sfm.hpp>
 
-namespace gazebo
-{
-class GZ_PLUGIN_VISIBLE PedestrianSFMPlugin : public ModelPlugin
-{
+namespace gazebo {
+class GZ_PLUGIN_VISIBLE PedestrianSFMPlugin : public ModelPlugin {
   /// \brief Constructor
 public:
   PedestrianSFMPlugin();
@@ -57,7 +55,6 @@ public:
 private:
   void OnUpdate(const common::UpdateInfo &_info);
 
-
   // private: void InitializePedestrians();
 
   /// \brief Helper function to detect the closest obstacles.
@@ -68,10 +65,9 @@ private:
 private:
   void HandlePedestrians();
 
+  //-------------------------------------------------
 
- //-------------------------------------------------
-
-   /// \brief this actor as a SFM agent
+  /// \brief this actor as a SFM agent
 private:
   sfm::Agent sfmActor;
 
@@ -120,9 +116,13 @@ private:
 private:
   std::vector<std::string> ignoreModels;
 
+  /// \brief Animation name of this actor
+private:
+  std::string animationName;
+
   /// \brief Custom trajectory info.
 private:
   physics::TrajectoryInfoPtr trajectoryInfo;
 };
-}
+} // namespace gazebo
 #endif
