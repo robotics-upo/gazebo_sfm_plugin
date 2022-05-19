@@ -79,16 +79,19 @@ The parameters that can be configured for each pedestrian are:
 
 ## Dependencies
 
-* Social Force Model library, lightsfm https://github.com/robotics-upo/lightsfm
+* Yo must download and install the Social Force Model library, lightsfm https://github.com/robotics-upo/lightsfm
 
 ## Compilation
 
-* This is a ROS package so it must be placed inside a ROS workspace and compiled through the regular Catkin tools. 
+* This is a ROS2 package so it must be placed inside a ROS2 workspace and compiled through the regular colcon compiler. 
+```sh
+colcon build --packages-select gazebo_sfm_plugin
+```
 
 ## Example
 
 An example Gazebo world can be launched through:
 ```sh
-roslaunch gazebo_sfm_plugin cafe.launch
+ros2 launch gazebo_sfm_plugin cafe_ros2.launch.py
 ```
 
