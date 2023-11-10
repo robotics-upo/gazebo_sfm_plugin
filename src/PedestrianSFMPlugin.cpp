@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include <string>
 
-//#include <ignition/math.hh>
-//#include <ignition/math/gzmath.hh>
+// #include <ignition/math.hh>
+// #include <ignition/math/gzmath.hh>
 #include <gazebo_sfm_plugin/PedestrianSFMPlugin.h>
 
 using namespace gazebo;
@@ -35,7 +35,8 @@ GZ_REGISTER_MODEL_PLUGIN(PedestrianSFMPlugin)
 PedestrianSFMPlugin::PedestrianSFMPlugin() {}
 
 /////////////////////////////////////////////////
-void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+{
   this->sdf = _sdf;
   this->actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
   this->world = this->actor->GetWorld();
@@ -104,22 +105,27 @@ void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     this->peopleDistance = 5.0;
 
   // Read in the pedestrians in your walking group
-  if (_sdf->HasElement("group")) {
+  if (_sdf->HasElement("group"))
+  {
     this->sfmActor.groupId = this->sfmActor.id;
     sdf::ElementPtr modelElem = _sdf->GetElement("group")->GetElement("model");
-    while (modelElem) {
+    while (modelElem)
+    {
       this->groupNames.push_back(modelElem->Get<std::string>());
       modelElem = modelElem->GetNextElement("model");
     }
     this->sfmActor.groupId = this->sfmActor.id;
-  } else
+  }
+  else
     this->sfmActor.groupId = -1;
 
   // Read in the other obstacles to ignore
-  if (_sdf->HasElement("ignore_obstacles")) {
+  if (_sdf->HasElement("ignore_obstacles"))
+  {
     sdf::ElementPtr modelElem =
         _sdf->GetElement("ignore_obstacles")->GetElement("model");
-    while (modelElem) {
+    while (modelElem)
+    {
       this->ignoreModels.push_back(modelElem->Get<std::string>());
       modelElem = modelElem->GetNextElement("model");
     }
@@ -127,23 +133,27 @@ void PedestrianSFMPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // Add our own name to models we should ignore when avoiding obstacles.
   this->ignoreModels.push_back(this->actor->GetName());
   // Add the other pedestrians to the ignored obstacles
-  for (unsigned int i = 0; i < this->world->ModelCount(); ++i) {
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
+  {
     physics::ModelPtr model = this->world->ModelByIndex(i); // GetModel(i);
 
     if (model->GetId() != this->actor->GetId() &&
-        ((int)model->GetType() == (int)this->actor->GetType())) {
+        ((int)model->GetType() == (int)this->actor->GetType()))
+    {
       this->ignoreModels.push_back(model->GetName());
     }
   }
 }
 
 /////////////////////////////////////////////////
-void PedestrianSFMPlugin::Reset() {
+void PedestrianSFMPlugin::Reset()
+{
   // this->velocity = 0.8;
   this->lastUpdate = 0;
 
   // Read in the goals to reach
-  if (this->sdf->HasElement("trajectory")) {
+  if (this->sdf->HasElement("trajectory"))
+  {
     sdf::ElementPtr modelElemCyclic =
         this->sdf->GetElement("trajectory")->GetElement("cyclic");
 
@@ -152,7 +162,8 @@ void PedestrianSFMPlugin::Reset() {
 
     sdf::ElementPtr modelElem =
         this->sdf->GetElement("trajectory")->GetElement("waypoint");
-    while (modelElem) {
+    while (modelElem)
+    {
       ignition::math::Vector3d g = modelElem->Get<ignition::math::Vector3d>();
       sfm::Goal goal;
       goal.center.set(g.X(), g.Y());
@@ -163,9 +174,12 @@ void PedestrianSFMPlugin::Reset() {
   }
 
   auto skelAnims = this->actor->SkeletonAnimations();
-  if (skelAnims.find(WALKING_ANIMATION) == skelAnims.end()) {
+  if (skelAnims.find(WALKING_ANIMATION) == skelAnims.end())
+  {
     gzerr << "Skeleton animation " << WALKING_ANIMATION << " not found.\n";
-  } else {
+  }
+  else
+  {
     // Create custom trajectory
     this->trajectoryInfo.reset(new physics::TrajectoryInfo());
     this->trajectoryInfo->type = WALKING_ANIMATION;
@@ -176,40 +190,57 @@ void PedestrianSFMPlugin::Reset() {
 }
 
 /////////////////////////////////////////////////
-void PedestrianSFMPlugin::HandleObstacles() {
+void PedestrianSFMPlugin::HandleObstacles()
+{
   double minDist = 10000.0;
   ignition::math::Vector3d closest_obs;
   ignition::math::Vector3d closest_obs2;
   this->sfmActor.obstacles1.clear();
 
-  for (unsigned int i = 0; i < this->world->ModelCount(); ++i) {
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
+  {
     physics::ModelPtr model = this->world->ModelByIndex(i); // GetModel(i);
     if (std::find(this->ignoreModels.begin(), this->ignoreModels.end(),
-                  model->GetName()) == this->ignoreModels.end()) {
+                  model->GetName()) == this->ignoreModels.end())
+    {
       ignition::math::Vector3d actorPos = this->actor->WorldPose().Pos();
       ignition::math::Vector3d modelPos = model->WorldPose().Pos();
-      std::tuple<bool, double, ignition::math::Vector3d> intersect =
-          model->BoundingBox().Intersect(modelPos, actorPos, 0.05, 8.0);
 
-      // ignition::math::Vector3d offset1 = modelPos - actorPos;
-      // double modelDist1 = offset1.Length();
-      // double dist1 = actorPos.Distance(modelPos);
+      // avoid compute agent itself
+      if (model->GetId() == this->actor->GetId())
+        continue;
 
-      ignition::math::Vector3d offset = std::get<2>(intersect) - actorPos;
-      double modelDist = offset.Length();
-      // double dist2 = actorPos.Distance(std::get<2>(intersect));
+      // This if is used to avoid an invisible obstacle that Gazebo is setting at (0,0). We don't know why it's happening.
+      if (modelPos.X() == 0.0 && modelPos.Y() == 0.0)
+        continue;
 
-      // printf("Actor %s, Model %s - dist: %.2f\n",
-      //        this->actor->GetName().c_str(), model->GetName().c_str(),
-      //        modelDist);
+      // std::tuple<bool, double, ignition::math::Vector3d> intersect =
+      //     model->BoundingBox().Intersect(modelPos, actorPos, 0.05, 8.0);
+      // ignition::math::Vector3d offset = std::get<2>(intersect) - actorPos;
+      // double modelDist = offset.Length();
+      ignition::math::Line3d act_obs_line(actorPos, modelPos);
+      std::tuple<bool, double, ignition::math::Vector3d> obs_intersect =
+          model->BoundingBox().Intersect(act_obs_line);
 
-      //{
-      if (modelDist < minDist) {
-        minDist = modelDist;
-        // closest_obs = offset;
-        closest_obs = std::get<2>(intersect);
+      ignition::math::Vector3d intersecPos;
+      double dist = -1;
+      if (std::get<0>(obs_intersect) == true)
+      {
+        intersecPos = std::get<2>(obs_intersect);
+        dist = std::get<1>(obs_intersect);
       }
-      //}
+      if (dist > 0)
+      {
+        ignition::math::Vector3d offset = intersecPos - actorPos;
+        double modelDist = offset.Length(); //-approximated_radius;
+        // double dist2 = actorPos.Distance(std::get<2>(intersect));
+        if (modelDist < minDist)
+        {
+          minDist = modelDist;
+          closest_obs = intersecPos;
+          // closest_obs = std::get<2>(intersect);
+        }
+      }
     }
   }
 
@@ -224,20 +255,24 @@ void PedestrianSFMPlugin::HandleObstacles() {
 }
 
 /////////////////////////////////////////////////
-void PedestrianSFMPlugin::HandlePedestrians() {
+void PedestrianSFMPlugin::HandlePedestrians()
+{
   this->otherActors.clear();
 
-  for (unsigned int i = 0; i < this->world->ModelCount(); ++i) {
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
+  {
     physics::ModelPtr model = this->world->ModelByIndex(i); // GetModel(i);
 
     if (model->GetId() != this->actor->GetId() &&
-        ((int)model->GetType() == (int)this->actor->GetType())) {
+        ((int)model->GetType() == (int)this->actor->GetType()))
+    {
       // printf("Actor %i has detected actor %i!\n", this->actor->GetId(),
       // model->GetId());
       ignition::math::Pose3d modelPose = model->WorldPose();
       ignition::math::Vector3d pos =
           modelPose.Pos() - this->actor->WorldPose().Pos();
-      if (pos.Length() < this->peopleDistance) {
+      if (pos.Length() < this->peopleDistance)
+      {
         sfm::Agent ped;
         ped.id = model->GetId();
         ped.position.set(modelPose.Pos().X(), modelPose.Pos().Y());
@@ -252,7 +287,8 @@ void PedestrianSFMPlugin::HandlePedestrians() {
         ped.angularVelocity = angvel.Z(); // Length()
 
         // check if the ped belongs to my group
-        if (this->sfmActor.groupId != -1) {
+        if (this->sfmActor.groupId != -1)
+        {
           std::vector<std::string>::iterator it;
           it = find(groupNames.begin(), groupNames.end(), model->GetName());
           if (it != groupNames.end())
@@ -269,7 +305,8 @@ void PedestrianSFMPlugin::HandlePedestrians() {
 }
 
 /////////////////////////////////////////////////
-void PedestrianSFMPlugin::OnUpdate(const common::UpdateInfo &_info) {
+void PedestrianSFMPlugin::OnUpdate(const common::UpdateInfo &_info)
+{
   // Time delta
   double dt = (_info.simTime - this->lastUpdate).Double();
 
@@ -302,7 +339,8 @@ void PedestrianSFMPlugin::OnUpdate(const common::UpdateInfo &_info) {
   ignition::math::Vector3d rpy = actorPose.Rot().Euler();
   utils::Angle current = utils::Angle::fromRadian(rpy.Z());
   double diff = (h - current).toRadian();
-  if (std::fabs(diff) > IGN_DTOR(10)) {
+  if (std::fabs(diff) > IGN_DTOR(10))
+  {
     current = current + utils::Angle::fromRadian(diff * 0.005);
     yaw = current.toRadian();
   }
