@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="paintbuckets">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <pose>0 0 0.4 0 0 0</pose>
+        <mass>50</mass>
+        <inertia>
+          <ixx>10.2096</ixx>
+          <iyy>10.2096</iyy>
+          <izz>12</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+        </inertia>>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://paintbuckets/meshes/paintbuckets.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://paintbuckets/meshes/paintbuckets.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
